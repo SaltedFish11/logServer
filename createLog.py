@@ -75,12 +75,13 @@ def sample_time():
 def sample_send_byte():
     return random.randint(0,5000)
 def sample_referer(cols):
-    # if random.uniform(0, 1) > 0.2:
-    #     return "-"
+    if random.uniform(0, 1) > 0.2:
+        return "-"
     try:
         refer_str = "https://www.jd.com/Search?keyword={query}"
-        key = str(cols[random.randint(0,len(cols)-1)])
-        midd= key.encode('utf-8')
+        key = str(cols[random.randint(0,len(cols)-1)]).lstrip()
+        split = key.split(' ')[0]
+        midd= split.encode('utf-8')
         # query_str = str(key).decode('utf8')
         # print query_str
         res = refer_str.format(query=midd)
@@ -113,13 +114,14 @@ def generate_log(cols):
     try:
         f = open("/yang/access.log", "w+")
         count = 0
-        while 1:
+        while count<100:
             referer = sample_referer(cols=cols)
             query_log = '{ip} - - {date} "{method} {url} HTTP/1.1" {status_code} {send_byte} "{referer}" "{ua}"'.format(
                 ip=sample_ip(),  date=sample_time(), method=sample_method(), url=sample_url(), status_code=sample_status_code(),
                 send_byte=sample_send_byte(), referer=referer, ua=sample_ua())
 
             f.write(query_log + "\n")
+            count = count + 1
             print query_log
     except Exception, e:
         msg = traceback.format_exc()
@@ -136,7 +138,7 @@ def open_excel(file= 'file.xls'):
 
 def excel_table_byname():#修改自己路径
     print "读取文件开始"
-    file= '/Users/yangwenrui/Downloads/ywr.xlsx'
+    file= './ywr.xlsx'
     # by_name=u'Sheet1'
     data = open_excel(file)
     table = data.sheet_by_index(0) #获得表格
@@ -145,6 +147,7 @@ def excel_table_byname():#修改自己路径
 
     list=[]
     for rownum in range(0,nrows):
+
         list.append(row[rownum])
     print "读取文件结束"
     return list
